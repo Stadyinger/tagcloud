@@ -1,0 +1,51 @@
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- 深蓝渐变：图4风格，增加了一个中间色值让渐变更细腻 -->
+    <linearGradient id="final_blue_grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#205AA7" />
+      <stop offset="50%" style="stop-color:#16427B" />
+      <stop offset="100%" style="stop-color:#081F42" />
+    </linearGradient>
+    
+    <!-- 阴影滤镜：增加图标的悬浮感 -->
+    <filter id="icon_shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="3" stdDeviation="3" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+
+  <!-- 1. 商圈聚合底座 (三个不规则形状的逻辑融合) -->
+  <path d="M40 30 C20 35 15 65 25 85 C35 105 65 115 90 100 C115 85 110 50 95 30 C80 10 55 25 40 30 Z" 
+        fill="url(#final_blue_grad)" filter="url(#shadow)" />
+
+  <!-- 2. 内部底纹：极简地图网格 (增加专业细节) -->
+  <g stroke="#FFFFFF" stroke-width="0.5" stroke-opacity="0.1">
+    <path d="M30 50 Q60 60 100 45" fill="none" />
+    <path d="M40 90 Q70 80 95 95" fill="none" />
+    <path d="M55 30 L65 110" fill="none" />
+  </g>
+
+  <!-- 3. 核心语义网络 (镂空设计) -->
+  <g fill="#FFFFFF">
+    <!-- 核心商圈 A (大节点) -->
+    <circle cx="58" cy="64" r="7" />
+    <!-- 核心商圈 B (中节点) -->
+    <circle cx="85" cy="55" r="5" />
+    
+    <!-- 词云脉络连线 (加粗以适配小尺寸) -->
+    <path d="M58 64 L40 45 M58 64 L85 55 M85 55 L95 75 M58 64 L50 85" 
+          stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+    
+    <!-- 抽象 POI 类型符号 -->
+    <circle cx="40" cy="45" r="3.5" /> <!-- 类型 1 -->
+    <rect x="46" y="81" width="8" height="8" rx="1.5" /> <!-- 类型 2 -->
+    <circle cx="95" cy="75" r="2.5" /> <!-- 类型 3 -->
+    
+    <!-- 散落在边缘的细碎数据点 (体现词云感) -->
+    <circle cx="75" cy="40" r="1.5" fill-opacity="0.4" />
+    <circle cx="35" cy="70" r="1.2" fill-opacity="0.4" />
+    <circle cx="80" cy="85" r="1.5" fill-opacity="0.4" />
+  </g>
+
+  <!-- 4. 高光勾勒 (模仿图4中的光泽感) -->
+  <path d="M42 32 C35 32 30 45 32 55" fill="none" stroke="#FFFFFF" stroke-width="1" stroke-opacity="0.2" stroke-linecap="round" />
+</svg>
