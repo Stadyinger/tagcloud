@@ -1,0 +1,22 @@
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <!-- 1. 外部轮廓骨架：加粗线条，去掉填充，体现区域感 -->
+  <path d="M40 30 C20 35 15 65 25 85 C35 105 65 115 90 100 C115 85 110 50 95 30 C80 10 55 25 40 30 Z" 
+        fill="none" stroke="#101010" stroke-width="4" stroke-linejoin="round" />
+
+  <!-- 2. 核心语义网络：突出连接关系 -->
+  <g fill="#101010" stroke="#101010">
+    <!-- 核心节点连线 - 加粗以突出骨架 -->
+    <path d="M58 64 L40 45 M58 64 L85 55 M85 55 L95 75 M58 64 L50 89" 
+          fill="none" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+    
+    <!-- 主要商圈节点 A (大) -->
+    <circle cx="58" cy="64" r="8" />
+    <!-- 主要商圈节点 B (中) -->
+    <circle cx="85" cy="55" r="6" />
+    
+    <!-- POI 类型节点 -->
+    <circle cx="40" cy="45" r="5" /> <!-- 类型 1 -->
+    <rect x="45" y="85" width="10" height="10" rx="1" /> <!-- 类型 2 -->
+    <circle cx="95" cy="75" r="4" /> <!-- 类型 3 -->
+  </g>
+</svg>
