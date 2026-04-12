@@ -1,162 +1,88 @@
-# 商圈标签云（https://stadyinger.github.io/tagcloud/）
+# 商圈标签云 (Bussiness TagCloud)
 
-本项目是一个面向城市商圈 POI 数据分析的可视化应用，提供“地图筛选 -> 数据查看 -> 词云生成 -> 细节增强”的完整流程。
-系统基于 Vue 3 + D3 + AMap 构建，支持在地图上绘制筛选区域，自动提取选区内 POI，并按商圈与类别进行标签云布局，适用于商圈研究、地理教学演示与可视分析实验。
+本项目是一个面向城市商圈 POI (Point of Interest) 数据分析的可视化集成应用。系统通过“地图交互筛选 -> 自动化数据聚合 -> 多维度词云生成”的完整工作流，帮助用户洞察商圈内部的商业业态构成与空间分布特征。
 
-![1773739888543-2026-3-1717:31:28.png](https://gitee.com/attacking-lei/firstprogect/raw/master/1773739888543-2026-3-1717:31:28.png)
-
-## 特性总览
-
-- 地图筛选联动：支持圆形、矩形、多边形绘制筛选，实时高亮选中 POI。
-- 商圈边界可视化：加载商圈轮廓和中心标记，根据缩放级别智能显隐。
-- 词云布局引擎：
-  - 基础模式下使用扇区约束 + 阿基米德螺旋进行类别内排布。
-  - 详细模式下使用距离场（SDF）进行缝隙二次填充，提升密度与可读性。
-- 多类别配色体系：按 POI 类型生成色带图例并在词云中同步渲染。
-- 数据面板协同：表格分页、条件筛选与地图筛选状态联动。
-- AI 对话助手：提供商圈数据问答、关键词筛选、名称精简等辅助交互能力。
-- 本地数据缓存：基于 Dexie（IndexedDB）管理商圈与 POI 数据，减少重复加载。
+基于 **Vue 3** (Compostion API)、**D3.js** 与 **高德地图 API** 构建，特别强化了空间约束下的词云布局算法与响应式视觉定制能力。
 
 ---
 
-## 技术栈
+## 🚀 特性总览
 
-- 框架与构建：Vue 3、Vite 7
-- 可视化：D3.js
-- 地图能力：高德地图 JS API（@amap/amap-jsapi-loader）
-- 状态管理：Pinia
-- 数据缓存：Dexie（IndexedDB）
-- UI 组件：Element Plus
-- 其他：Axios、Marked、OpenAI SDK
-
-依赖与脚本详见 package.json。
+- **地图选区联动**：内置圆形、矩形及多边形手绘工具，支持实时筛选千万级海量 POI 点单并自动聚合至对应商圈或区域。
+- **商圈空间可视化**：加载城市级商圈地理边界（Polygon），根据地图缩放层级（Zoom Level）智能切换热点标记与详细边界显示。
+- **双引擎词云布局**：
+  - **基础模式**：采用基于部门扇区约束的阿基米德螺旋线算法，确保各类别 POI 颜色边界清晰。
+  - **精细模式 (SDF)**：集成符号距离场 (Signed Distance Field) 算法，对词云缝隙进行二次填充，极大提升视觉密度与标签可读性。
+- **自定义色彩体系**：
+  - 预设 30+ 套高对比度及专业商务配色方案。
+  - 支持 **响应式自定义色彩面板**，用户能针对“餐饮、购物、景点、娱乐、科教、其它”六大核心 POI 类别进行实时配准。
+- **AI 交互助手**：内置 AI 智能对话界面，支持自然语言查询（如“筛选高权重餐饮点”、“重置当前选区”）以及名称精简提示。
+- **本地高性能缓存**：基于 **Dexie (IndexedDB)** 管理商圈与海量 POI 数据，大幅减少重复网络加载，实现秒级响应。
 
 ---
 
-## 项目结构
+## 🛠 技术栈
+
+- **框架与构建**: Vue 3, Vite 7
+- **可视化**: D3.js (v7)
+- **地图引擎**: 高德地图 JS API 2.0 (@amap/amap-jsapi-loader)
+- **状态管理**: Pinia
+- **持久化**: Dexie.js (IndexedDB)
+- **UI 组件**: Element Plus
+- **MD 解析**: Marked.js
+
+---
+
+## 📂 项目结构 (最新优化)
 
 ```text
 bussiness_tagCloud/
 ├── public/
-│   ├── grouped_pois_detail.json      # 原始商圈+POI数据
-│   ├── name.json                     # 名称映射数据
-│   └── *.svg / *.png                 # 界面图标资源
+│   ├── grouped_pois_detail.json      # 全量商圈地理多边形及 POI 明细
+│   └── *.svg / *.png                 # 界面功能图标
 ├── src/
-│   ├── App.vue                       # 主布局（左侧控制区 + 右侧词云区）
+│   ├── App.vue                       # 应用主控：整合全屏布局与侧边栏、视图分发控制逻辑
+│   ├── views/
+│   │   └── Help.vue                  # 帮助中心：实时读取并渲染交互式文档，支持锚点跳转
+│   ├── Layout/
+│   │   ├── HeaderMid.vue             # 顶部交互式导航：处理事件分发流与动态背景滑块
+│   │   ├── Aside.vue                 # 模块切换侧边栏
+│   │   └── Content.vue               # 内容面板承载器（地图/数据/色彩/字体等）
 │   ├── components/
-│   │   ├── TagCloud.vue              # 词云核心渲染组件
-│   │   └── AiDialog.vue              # AI 助手抽屉
+│   │   ├── TagCloud.vue              # 词云图形中心：碰撞计算、SDF 空间采样与 SVG 绘制核心
+│   │   └── AiDialog.vue              # AI 虚拟助手：封装对话接口与指令映射
 │   ├── content/
-│   │   ├── mapContent.vue            # 地图与选区绘制
-│   │   ├── dataContent.vue           # POI 表格与筛选
-│   │   ├── colorContent.vue          # 配色面板
-│   │   └── fontContent.vue           # 字体面板
+│   │   ├── mapContent.vue            # 地图主逻辑：底图加载、绘制选区与空间坐标计算
+│   │   └── colorContent.vue          # 配色定制中心：响应式拾色器与自定义调色盘
 │   ├── stores/
-│   │   └── poiStore.js               # 全局数据状态与数据处理
+│   │   └── poiStore.js               # 全局 Pinia 仓库：统一管理选区状态与数据处理流
 │   ├── utils/
-│   │   ├── mapTools.js               # 地图辅助渲染工具
-│   │   └── tagCloudTool.js           # 词云几何、碰撞、SDF工具
+│   │   ├── tagCloudTool.js           # 算法包：阿基米德螺线计算、空间栅格化与布点逻辑
+│   │   └── mapTools.js               # 地图辅助：区域筛选、多边形裁剪等工具函数
 │   └── db/
-│       └── dexieDB.js                # IndexedDB 数据表定义
-├── vite.config.js
-└── package.json
+│       └── dexieDB.js                # IndexedDB 表定义与持久化缓存策略
+├── package.json
+└── vite.config.js
 ```
 
 ---
 
-## 快速开始
+## ⚙️ 快速开始
 
-### 1. 环境要求
-
-- Node.js: ^20.19.0 或 >=22.12.0
-- 推荐 npm 10+
-
-### 2. 安装依赖
-
-```bash
-npm install
-```
-
-### 3. 启动开发环境
-
-```bash
-npm run dev
-```
-
-默认启动后访问控制台输出的本地地址（通常为 `http://localhost:5173`）。
-
-### 4. 生产构建与预览
-
-```bash
-npm run build
-npm run preview
-```
-
-### 5. 代码规范检查
-
-```bash
-npm run lint
-npm run format
-```
+1. **环境**: Node.js v20+
+2. **安装**: `npm install`
+3. **开发**: `npm run dev`
+4. **访问**: `http://localhost:5173`
 
 ---
 
-## 核心流程
+## 📝 核心业务流程
 
-1. 在地图面板绘制筛选区域（圆/矩形/多边形）。
-2. 系统筛选选区内 POI，并同步到数据表与状态仓库。
-3. 点击“绘制标签云”，按商圈聚合并进行类型分扇区布局。
-4. 在“详细显示”模式下启用 SDF 距离场填充，提高局部密度。
-5. 根据字体和配色面板调整视觉风格，实时反馈到词云画布。
-
----
-
-## 核心模块说明
-
-- `src/content/mapContent.vue`
-  - 加载高德地图、商圈多边形、海量点图层。
-  - 处理选区绘制、区域筛选、底图切换与检索定位。
-
-- `src/stores/poiStore.js`
-  - 管理 `selectedArea`、`selectedPois`、`allPoisData`、`isDetailMode` 等关键状态。
-  - 提供 `getStructuredPoisData()`，将筛选结果按商圈聚合为词云输入。
-
-- `src/components/TagCloud.vue`
-  - 词云渲染主逻辑：坐标映射、碰撞检测、轮廓生成、全局商圈避让。
-  - 详细模式下结合 `rasterizeSpace()` 与 `computeDistanceField()` 做二次填充。
-
-- `src/content/dataContent.vue`
-  - 提供可分页、可条件过滤的数据表，便于核查筛选结果。
-
-- `src/components/AiDialog.vue`
-  - 提供自然语言问答和指令式操作（筛选、重置、名称精简）。
-
----
-
-## 数据说明
-
-- 主数据文件：`public/grouped_pois_detail.json`
-- 数据入库后分为两类：
-  - `shapes`：商圈边界、中心、排名等信息
-  - `pois`：POI 名称、类型、经纬度、权重、所属商圈
-
-项目会在首次导入后写入 IndexedDB，后续优先从本地缓存读取。
-
----
-
-## 配置与注意事项
-
-- 地图 Key
-  - 当前在地图组件中通过 `apiKey` 配置高德 JS API Key。
-  - 部署时请将 Key 与域名白名单保持一致。
-
-- AI 能力
-  - 当前 AI 对话组件使用浏览器侧请求方式，仅适合开发与演示。
-  - 生产环境建议改为后端代理转发，避免敏感密钥暴露。
-
-- 性能建议
-  - 在超大数据量下，优先关闭“详细显示”进行快速预览。
-  - 详细显示模式会执行更密集的空间采样与碰撞检测，耗时更高。
+1. **确定区域**：在右侧地图面板使用绘制工具划定感兴趣的选区。
+2. **数据处理**：系统自动调用 `poiStore` 将筛选出的 POI 按商圈名称聚合。
+3. **视觉配置**：通过“色彩面板”调整业务分类颜色，或者在“侧边栏”切换详细显示或基础显示。
+4. **一键生成**：点击“绘制标签云”，算法自动避让建筑物并进行排布。
+5. **手册查阅**：点击导航栏“帮助”即可查阅该说明文档及其详细用法。
 
 ---
 
